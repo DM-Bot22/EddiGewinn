@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const prizeImage = document.getElementById('prizeImage');
     const scratchContainer = document.getElementById('scratchContainer');
-    // messageBox entfernt
     
     // === KONFIGURATION ===
     const REVEAL_THRESHOLD = 0.40;
@@ -49,9 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         scratchCtx.globalAlpha = 1.0;
         scratchCanvas.style.opacity = 1.0; 
         
+        // Füllt das Canvas (Z2) mit Farbe, wodurch das CSS-Hintergrundmuster sichtbar wird
         scratchCtx.fillStyle = SCRATCH_COLOR;
         scratchCtx.fillRect(0, 0, currentWidth, currentHeight);
         
+        // Radiermodus: macht Z2 transparent
         scratchCtx.globalCompositeOperation = 'destination-out'; 
         
         scratchCtx.strokeStyle = 'rgba(0,0,0,1)'; 
@@ -197,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (scratchAlpha <= 0) {
                 scratchAlpha = 0;
                 scratchCanvas.style.display = 'none';
-                // Nachricht entfernt
                 return;
             }
             
