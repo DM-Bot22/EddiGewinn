@@ -4,13 +4,14 @@ body {
     align-items: center;
     justify-content: center; /* KRITISCH: Zentriert den Container vertikal */
     min-height: 100vh;
-    margin: 0;
-    padding: 0; /* KRITISCH: Entfernt das Padding, das Scrollen verursachen kann */
+    margin: 0; /* KRITISCH: Entfernt den Standard-Rand */
+    padding: 0; /* KRITISCH: Entfernt das Standard-Padding */
     background-color: #f4f4f4;
     font-family: Arial, sans-serif;
+    
+    /* Versucht, Überlauf zu vermeiden */
+    overflow: hidden; 
 }
-
-/* Header-Styles entfernt */
 
 /* ======================================= */
 /* === CONTAINER UND CANVAS-POSITIONIERUNG === */
@@ -24,12 +25,13 @@ body {
     
     transition: width 0.4s ease-in-out, height 0.4s ease-in-out, transform 0.4s ease-in-out;
     
+    /* Hintergrund: Sorgt für das sichtbare Muster */
     background-image: url('scratch-pattern.png'); 
     background-repeat: repeat; 
     background-color: #AAAAAA; 
-    touch-action: none; 
+    touch-action: none; /* KRITISCH für mobiles Rubbeln */
     
-    /* Fügt eine maximale Begrenzung hinzu, um Überlauf zu vermeiden */
+    /* Setzt eine maximale Begrenzung relativ zur Viewport-Höhe */
     max-width: 100%;
     max-height: 100vh; 
 }
@@ -77,10 +79,8 @@ body {
 }
 
 /* ======================================= */
-/* === STYLES FÜR MESSAGES (Nur Hidden) === */
+/* === ZUSÄTZLICHE STYLES === */
 /* ======================================= */
-
-/* #messageBox Styles entfernt */
 
 .hidden {
     display: none !important;
@@ -91,12 +91,13 @@ body {
     /* Setzt die Größe des CONTAINERS proportional zur Viewport-Breite */
     #scratchContainer.portrait-mode {
         width: 90vw; 
-        height: 135vw; /* 400:600 Verhältnis */
+        /* Passt die Höhe automatisch an das Verhältnis 400:600 an */
+        height: 135vw; 
     }
     
     #scratchContainer.landscape-mode {
         width: 90vw;
-        height: 60vw; /* 600:400 Verhältnis */
+        height: 60vw; 
     }
     
     /* KRITISCH: Die Canvases füllen 100% des Containers aus */
