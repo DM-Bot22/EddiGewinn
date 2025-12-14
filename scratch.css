@@ -1,0 +1,122 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* ======================================= */
+/* === CONTAINER UND CANVAS-POSITIONIERUNG === */
+/* ======================================= */
+
+#scratchContainer {
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 5px solid #fff;
+    border-radius: 10px; 
+    
+    transition: width 0.4s ease-in-out, height 0.4s ease-in-out, transform 0.4s ease-in-out;
+    
+    /* Das Muster wird als Hintergrund für den Container gesetzt (sichtbar durch die transparente Farbebene) */
+    background-image: url('scratch-pattern.png'); 
+    background-repeat: repeat; 
+    background-color: #AAAAAA; /* Fallback Farbe */
+    touch-action: none; /* KRITISCH für mobiles Rubbeln */
+}
+
+#prizeCanvas, #scratchCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none; /* Wichtig für reibungsloses Rubbeln auf Touch-Geräten */
+}
+
+#scratchCanvas {
+    z-index: 2; /* Liegt über dem PrizeCanvas (die rubbelbare Farbebene) */
+}
+
+#prizeCanvas {
+    z-index: 1; /* Das Preisbild (Hintergrund) */
+}
+
+/* ======================================= */
+/* === GRÖßEN (Standardgrößen) === */
+/* ======================================= */
+
+/* Standard: HOCHFORMAT (Initialisierung der Größe, wenn kein Vollbild-Klick erfolgt) */
+#scratchContainer.portrait-mode {
+    width: 400px;
+    height: 600px;
+}
+
+/* QUERFORMAT */
+#scratchContainer.landscape-mode {
+    width: 600px;
+    height: 400px;
+}
+
+.portrait-mode canvas {
+    width: 400px;
+    height: 600px;
+}
+
+.landscape-mode canvas {
+    width: 600px;
+    height: 400px;
+}
+
+/* ======================================= */
+/* === STYLES FÜR BUTTONS UND MESSAGES === */
+/* ======================================= */
+
+/* #fullscreenBtn wurde aus HTML entfernt */
+
+#messageBox {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* MEDIA QUERY für kleinere Bildschirme (Mobile) */
+@media (max-width: 650px) {
+    /* Passt die Größe proportional an die Viewport-Breite an */
+    #scratchContainer.portrait-mode, .portrait-mode canvas {
+        width: 90vw; 
+        height: 135vw; /* 400:600 Verhältnis */
+    }
+    
+    #scratchContainer.landscape-mode, .landscape-mode canvas {
+        width: 90vw;
+        height: 60vw; /* 600:400 Verhältnis */
+    }
+    
+    body {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 1.5em;
+    }
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Ihr Überraschungspreis</title>
+    
+    <link rel="stylesheet" href="scratch.css">
+    
+</head>
+<body>
+
+    <header>
+        <h1>Weil Eddi sooo dankbar war für die Socke, hat er dir ein Geschenk hinterlassen</h1>
+        <p>Schau nach, was du bekommst!</p>
+    </header>
+
+    <div id="scratchContainer" class="portrait-mode">
+        
+        <canvas id="prizeCanvas" width="400" height="600"></canvas>
+
+        <canvas id="scratchCanvas" width="400" height="600"></canvas>
+        
+    </div>
+    
+    <div id="messageBox" class="hidden">
+        <h2>🎉 Glückwunsch!</h2>
+        <p>Der Preis ist vollständig enthüllt.</p>
+    </div>
+
+    <img id="prizeImage" src="prize_image.jpg" class="hidden" alt="Das freigerubbelte Preisbild">
+    
+    <script src="scratch.js"></script>
+
+</body>
+</html>
