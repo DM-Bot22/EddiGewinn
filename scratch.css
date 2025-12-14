@@ -11,7 +11,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center; /* Zentriert den Container */
-    background-color: #f4f4f4;
+    background-color: #AAAAAA;
     font-family: Arial, sans-serif;
 }
 
@@ -88,3 +88,4 @@ body {
 #prizeImage {
     display: none !important; /* KRITISCH: Versteckt das Quellbild explizit */
 }
+
