@@ -1,237 +1,90 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // === CANVASES UND CONTEXTE ===
-    const prizeCanvas = document.getElementById('prizeCanvas'); 
-    const prizeCtx = prizeCanvas.getContext('2d');
+html, body {
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; /* KRITISCH: Verhindert JEDES Scrollen */
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Zentriert den Container */
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+/* ======================================= */
+/* === CONTAINER UND CANVAS-POSITIONIERUNG === */
+/* ======================================= */
+
+#scratchContainer {
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 10px; 
     
-    const scratchCanvas = document.getElementById('scratchCanvas'); 
-    const scratchCtx = scratchCanvas.getContext('2d');
+    transition: width 0.4s ease-in-out, height 0.4s ease-in-out;
     
-    const prizeImage = document.getElementById('prizeImage');
-    const scratchContainer = document.getElementById('scratchContainer');
+    /* Hintergrund: Sorgt für das sichtbare Muster */
+    background-image: url('scratch-pattern.png'); 
+    background-repeat: repeat; 
+    background-color: #AAAAAA; 
+    touch-action: none; 
     
-    // === KONFIGURATION ===
-    const REVEAL_THRESHOLD = 0.40;
-    const BRUSH_SIZE = 40; 
-    const FADE_SPEED = 0.02; 
-    
-    const BASE_WIDTH = 400;
-    const BASE_HEIGHT = 600;
-    const SCRATCH_COLOR = '#AAAAAA'; 
-    
-    let isScratching = false;
-    let isRevealed = false;
-    let scratchAlpha = 1.0;
-    
-    let currentWidth = BASE_WIDTH;
-    let currentHeight = BASE_HEIGHT;
-    
-    const patternReady = true; 
+    /* Maximale Größe auf den gesamten Viewport beschränken */
+    max-width: 100vw;
+    max-height: 100vh; 
+}
 
-    // === INITIALISIERUNG FUNKTIONEN ===
+#prizeCanvas, #scratchCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none; 
+}
 
-    function initPrizeCanvas() {
-        prizeCtx.clearRect(0, 0, currentWidth, currentHeight);
-        
-        if (prizeImage.complete && prizeImage.naturalWidth > 0) {
-            prizeCtx.drawImage(
-                prizeImage, 
-                0, 0, prizeImage.naturalWidth, prizeImage.naturalHeight, 
-                0, 0, currentWidth, currentHeight 
-            );
-        }
-    }
+#scratchCanvas {
+    z-index: 2; 
+}
 
-    function initScratchCanvas() {
-        scratchCtx.globalCompositeOperation = 'source-over'; 
-        scratchCtx.clearRect(0, 0, currentWidth, currentHeight);
+#prizeCanvas {
+    z-index: 1; 
+}
 
-        scratchCtx.globalAlpha = 1.0;
-        scratchCanvas.style.opacity = 1.0; 
-        
-        scratchCtx.fillStyle = SCRATCH_COLOR;
-        scratchCtx.fillRect(0, 0, currentWidth, currentHeight);
-        
-        scratchCtx.globalCompositeOperation = 'destination-out'; 
-        
-        scratchCtx.strokeStyle = 'rgba(0,0,0,1)'; 
-        scratchCtx.lineWidth = BRUSH_SIZE;
-        scratchCtx.lineCap = 'round';
-        scratchCtx.lineJoin = 'round';
-        
-        scratchCtx.beginPath();
-    }
+/* ======================================= */
+/* === GRÖSSENANPASSUNG (VOLLBILD-MAXIMIERUNG) === */
+/* ======================================= */
 
-    function updateDimensions(w, h, resetScratch = false) {
-        currentWidth = w;
-        currentHeight = h;
-        
-        // KRITISCH: Hier werden die internen Canvas-Größen (400x600) gesetzt.
-        scratchContainer.style.width = `${w}px`;
-        scratchContainer.style.height = `${h}px`;
+/* PORTRAIT MODE (W:H = 1:1.5) */
+#scratchContainer.portrait-mode {
+    width: min(100vw, calc(100vh / 1.5)); 
+    height: min(100vh, calc(100vw * 1.5));
+}
 
-        prizeCanvas.width = w;
-        prizeCanvas.height = h;
-        scratchCanvas.width = w;
-        scratchCanvas.height = h;
-        
-        initPrizeCanvas();
-        
-        if (prizeImage.naturalWidth === 0 && !prizeImage.complete) {
-            setTimeout(initPrizeCanvas, 100); 
-        }
+/* QUERFORMAT MODE (W:H = 1.5:1) */
+#scratchContainer.landscape-mode {
+    width: min(100vw, calc(100vh * 1.5));
+    height: min(100vh, calc(100vw / 1.5));
+}
 
-        if (resetScratch || !isRevealed) {
-            initScratchCanvas();
-            isRevealed = false; 
-            scratchAlpha = 1.0;
-        }
-    }
-    
-    // === AUTOMATISCHE ROTATIONSLOGIK ===
+/* Die Canvases füllen 100% des dynamischen Containers */
+#scratchContainer canvas {
+    width: 100%; 
+    height: 100%;
+}
 
-    function handleOrientationChange() {
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        
-        const isCurrentPortrait = windowHeight >= windowWidth; 
-        
-        let newCanvasWidth, newCanvasHeight;
-        
-        if (isCurrentPortrait) {
-            newCanvasWidth = BASE_WIDTH;
-            newCanvasHeight = BASE_HEIGHT;
-            scratchContainer.classList.remove('landscape-mode');
-            scratchContainer.classList.add('portrait-mode');
-        } else {
-            newCanvasWidth = BASE_HEIGHT;
-            newCanvasHeight = BASE_WIDTH;
-            scratchContainer.classList.remove('portrait-mode');
-            scratchContainer.classList.add('landscape-mode');
-        }
-        
-        updateDimensions(newCanvasWidth, newCanvasHeight, true); 
-    }
+/* ======================================= */
+/* === ZUSÄTZLICHE STYLES === */
+/* ======================================= */
 
-    // === RUBBELN LOGIK ===
-    
-    function getMousePos(e) {
-        const rect = scratchCanvas.getBoundingClientRect();
-        let clientX, clientY;
+.hidden {
+    display: none !important; /* Versteckt alles mit der Klasse 'hidden' */
+}
 
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-
-        return {
-            x: (clientX - rect.left) * (currentWidth / rect.width),
-            y: (clientY - rect.top) * (currentHeight / rect.height)
-        };
-    }
-
-    function startScratch(e) {
-        e.preventDefault();
-        if (isRevealed) return; 
-        
-        isScratching = true;
-        const pos = getMousePos(e);
-        
-        scratchCtx.beginPath();
-        scratchCtx.moveTo(pos.x, pos.y);
-    }
-
-    function scratchMove(e) {
-        e.preventDefault();
-        if (!isScratching || isRevealed) return;
-
-        const pos = getMousePos(e);
-        
-        scratchCtx.lineTo(pos.x, pos.y);
-        scratchCtx.stroke();
-        
-        checkRevealPercentage();
-    }
-
-    function endScratch() {
-        if (!isScratching || isRevealed) return;
-        isScratching = false;
-
-        checkRevealPercentage();
-    }
-    
-    // === PROZENT-CHECK LOGIK ===
-    
-    function checkRevealPercentage() {
-        if (isRevealed) return;
-
-        const data = scratchCtx.getImageData(0, 0, currentWidth, currentHeight).data;
-        let revealedPixels = 0;
-        const totalPixels = currentWidth * currentHeight;
-        
-        for (let i = 3; i < data.length; i += 4) {
-            if (data[i] === 0) {
-                revealedPixels++;
-            }
-        }
-        
-        const percentage = revealedPixels / totalPixels;
-        
-        if (percentage >= REVEAL_THRESHOLD) {
-            isRevealed = true;
-            startFadeOut();
-        }
-    }
-    
-    // === ANIMATION LOGIK ===
-    
-    function startFadeOut() {
-        scratchCtx.globalCompositeOperation = 'source-over'; 
-        
-        scratchCanvas.style.display = 'block'; 
-        scratchCanvas.style.opacity = scratchAlpha; 
-        
-        function fadeStep() {
-            if (scratchAlpha <= 0) {
-                scratchAlpha = 0;
-                scratchCanvas.style.display = 'none';
-                return;
-            }
-            
-            scratchAlpha -= FADE_SPEED;
-            scratchCanvas.style.opacity = scratchAlpha; 
-            
-            requestAnimationFrame(fadeStep);
-        }
-
-        requestAnimationFrame(fadeStep);
-    }
-    
-    // === EVENT LISTENER ANBINDEN ===
-
-    scratchCanvas.addEventListener('mousedown', startScratch);
-    document.addEventListener('mousemove', scratchMove); 
-    document.addEventListener('mouseup', endScratch); 
-    
-    scratchCanvas.addEventListener('touchstart', startScratch, { passive: false });
-    scratchCanvas.addEventListener('touchmove', scratchMove, { passive: false });
-    scratchCanvas.addEventListener('touchend', endScratch);
-
-    window.addEventListener('resize', handleOrientationChange);
-    
-    // === INITIALISIERUNG BEIM START ===
-
-    const assetsLoaded = () => {
-        if (prizeImage.complete && prizeImage.naturalWidth > 0 && patternReady) {
-            handleOrientationChange(); 
-        }
-    };
-
-    if (!prizeImage.complete || prizeImage.naturalWidth === 0) {
-        prizeImage.onload = assetsLoaded;
-    } else {
-        assetsLoaded(); 
-    }
-});
+#prizeImage {
+    display: none !important; /* KRITISCH: Versteckt das Quellbild explizit */
+}
