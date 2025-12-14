@@ -28,10 +28,10 @@ header {
     
     transition: width 0.4s ease-in-out, height 0.4s ease-in-out, transform 0.4s ease-in-out;
     
-    /* Das Muster wird als Hintergrund für den Container gesetzt (sichtbar durch die transparente Farbebene) */
+    /* Hintergrund: Sorgt für das sichtbare Muster durch die transparente Farbebene */
     background-image: url('scratch-pattern.png'); 
     background-repeat: repeat; 
-    background-color: #AAAAAA; /* Fallback Farbe */
+    background-color: #AAAAAA; 
     touch-action: none; /* KRITISCH für mobiles Rubbeln */
 }
 
@@ -42,22 +42,22 @@ header {
     display: block;
     user-select: none;
     -webkit-user-select: none;
-    touch-action: none; /* Wichtig für reibungsloses Rubbeln auf Touch-Geräten */
+    touch-action: none; 
 }
 
 #scratchCanvas {
-    z-index: 2; /* Liegt über dem PrizeCanvas (die rubbelbare Farbebene) */
+    z-index: 2; /* Die Rubbelfläche liegt oben */
 }
 
 #prizeCanvas {
-    z-index: 1; /* Das Preisbild (Hintergrund) */
+    z-index: 1; /* Das Preisbild liegt unten */
 }
 
 /* ======================================= */
 /* === GRÖßEN (Standardgrößen) === */
 /* ======================================= */
 
-/* Standard: HOCHFORMAT (Initialisierung der Größe, wenn kein Vollbild-Klick erfolgt) */
+/* Standard: HOCHFORMAT */
 #scratchContainer.portrait-mode {
     width: 400px;
     height: 600px;
@@ -80,10 +80,8 @@ header {
 }
 
 /* ======================================= */
-/* === STYLES FÜR BUTTONS UND MESSAGES === */
+/* === STYLES FÜR MESSAGES === */
 /* ======================================= */
-
-/* #fullscreenBtn wurde aus HTML entfernt */
 
 #messageBox {
     margin-top: 30px;
@@ -101,22 +99,27 @@ header {
 
 /* MEDIA QUERY für kleinere Bildschirme (Mobile) */
 @media (max-width: 650px) {
-    /* Passt die Größe proportional an die Viewport-Breite an */
-    #scratchContainer.portrait-mode, .portrait-mode canvas {
+    /* Setzt die Größe des CONTAINERS proportional zur Viewport-Breite */
+    #scratchContainer.portrait-mode {
         width: 90vw; 
         height: 135vw; /* 400:600 Verhältnis */
     }
     
-    #scratchContainer.landscape-mode, .landscape-mode canvas {
+    #scratchContainer.landscape-mode {
         width: 90vw;
         height: 60vw; /* 600:400 Verhältnis */
     }
     
-    body {
-        padding: 10px;
+    /* KRITISCH: Die Canvases MÜSSEN 100% des Containers ausfüllen (Fix für das Skalierungsproblem) */
+    .portrait-mode #prizeCanvas, 
+    .portrait-mode #scratchCanvas,
+    .landscape-mode #prizeCanvas, 
+    .landscape-mode #scratchCanvas {
+        width: 100%; 
+        height: 100%;
     }
     
-    header h1 {
-        font-size: 1.5em;
+    body {
+        padding: 10px;
     }
 }
